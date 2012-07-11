@@ -37,6 +37,13 @@ class mysql (
     require => Service['mysql'],
   }
 
+  exec { 'mysql-remove-anonymous':
+    onlyif => 'mysqladmin -ubingoberra status',
+    path => ['/bin', '/usr/bin'],
+    command => "echo \"DROP USER ''@'localhost'; DROP USER ''@'host_name';\" | mysql -uroot -p${password}",
+    require => Service['mysql'],
+  }
+
   define conf_file() {
     file { "/etc/mysql/${name}":
       owner => root,
