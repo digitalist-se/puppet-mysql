@@ -1,5 +1,5 @@
 class mysql (
-  $module_root = '/tmp/vagrant-puppet/manifests/modules/mysql',
+  $module_root = 'puppet:///modules/mysql/',
   $packages = [
     'mysql-client',
     'mysql-common',
@@ -14,7 +14,8 @@ class mysql (
     'my.cnf'
   ],
   $password = 'password',
-  $hostname = 'purple0.nod1.se'
+  $hostname = 'purple0.nod1.se',
+  $local_only = true
 ) {
   package { $packages:
     ensure => installed,
@@ -51,6 +52,16 @@ class mysql (
       group => root,
       mode => 0444,
       source => "${module_root}/files/${name}",
+    }
+  }
+
+  if ! $local_only {
+    file { '/etc/mysql/dbnode-my.conf':
+      owner  => root,
+      group  => root,
+      mode   => '0444',
+      source => 'puppet:///modules/mysql/dbnode-my.conf',
+      path   => '/etc/mysql/dbnode-my.conf';
     }
   }
 }
