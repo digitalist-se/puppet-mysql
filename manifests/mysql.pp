@@ -1,7 +1,6 @@
 class mysql (
   $module_root = 'puppet:///modules/mysql/',
   $packages = [
-    'mysql-client',
     'mysql-common',
     'mysql-server'
   ],
@@ -56,12 +55,13 @@ class mysql (
   }
 
   if ! $local_only {
-    file { '/etc/mysql/dbnode-my.conf':
+    file { '/etc/mysql/dbnode-my.cnf':
       owner  => root,
       group  => root,
       mode   => '0444',
-      source => 'puppet:///modules/mysql/dbnode-my.conf',
-      path   => '/etc/mysql/dbnode-my.conf';
+      source => 'puppet:///modules/mysql/dbnode-my.cnf',
+      path   => '/etc/mysql/my.cnf',
+      notify => Service['mysql']
     }
   }
 }
