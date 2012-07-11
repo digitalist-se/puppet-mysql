@@ -13,7 +13,8 @@ class mysql (
     'conf.d/slow-query.cnf',
     'my.cnf'
   ],
-  $password = 'password'
+  $password = 'password',
+  $hostname = 'purple0.nod1.se'
 ) {
   package { $packages:
     ensure => installed,
@@ -40,7 +41,7 @@ class mysql (
   exec { 'mysql-remove-anonymous':
     onlyif => 'mysqladmin -ubingoberra status',
     path => ['/bin', '/usr/bin'],
-    command => "echo \"DROP USER ''@'localhost'; DROP USER ''@'host_name';\" | mysql -uroot -p${password}",
+    command => "echo \"DROP USER ''@'localhost'; DROP USER ''@'$hostname';\" | mysql -uroot -p${password}",
     require => Service['mysql'],
   }
 
