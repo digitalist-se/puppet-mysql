@@ -14,7 +14,11 @@ class mysql (
   ],
   $password = 'password',
   $hostname = 'purple0.nod1.se',
-  $local_only = true
+  $local_only = true,
+  $create_aegir_user = false,
+  $aegir_user = '',
+  $aegir_password = '',
+  $aegir_host = 'purple0.nod1.se',
 ) {
   package { $packages:
     ensure => installed,
@@ -62,6 +66,15 @@ class mysql (
       source => 'puppet:///modules/mysql/dbnode-my.cnf',
       path   => '/etc/mysql/my.cnf',
       notify => Service['mysql']
+    }
+
+    if $create_aegir_user {
+      exec { 'mysql-create-aegir-user':
+        unless => "echo 'use mysql;select user from user;' | mysql -uroot -ppassword | grep ${aegir_user} > /dev/null",
+        path => ['/bin', '/usr/bin'],
+        command => "CREATE USER ${aegir_user} IDENTIFIED BY '${aegir_password}'; GRANT ALL PRIVILEGES ON *.* TO '${aegir_user}'@'${aegir_host}' IDENTIFIED BY '${aegir_password}' WITH GRANT OPTION;",
+        require => Service['mysql']
+      }
     }
   }
 }
