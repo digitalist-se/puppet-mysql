@@ -46,7 +46,7 @@ class mysql (
     onlyif => 'mysqladmin -ubingoberra status',
     path => ['/bin', '/usr/bin'],
     command => "echo \"DROP USER ''@'localhost'; DROP USER ''@'$hostname';\" | mysql -uroot -p${password}",
-    require => Service['mysql'],
+    require => [Service['mysql'], Exec['mysqladmin password']],
   }
 
   define conf_file() {
