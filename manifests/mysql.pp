@@ -45,7 +45,7 @@ class mysql (
   exec { 'mysql-remove-anonymous':
     onlyif => 'mysqladmin -ubingoberra status',
     path => ['/bin', '/usr/bin'],
-    command => "echo \"DROP USER ''@'localhost'; DROP USER ''@'$hostname';\" | mysql -uroot -p${password}",
+    command => "echo \"DROP USER ''@'localhost'; DROP USER ''@'${hostname}';\" | mysql -uroot -p${password}",
     require => [Service['mysql'], Exec['mysqladmin password']],
   }
 
@@ -72,7 +72,7 @@ class mysql (
       exec { 'mysql-create-aegir-user':
         unless => "echo 'use mysql;select user from user;' | mysql -uroot -ppassword | grep ${aegir_user} > /dev/null",
         path => ['/bin', '/usr/bin'],
-        command => "CREATE USER ${aegir_user} IDENTIFIED BY '${aegir_password}'; GRANT ALL PRIVILEGES ON *.* TO '${aegir_user}'@'${aegir_host}' IDENTIFIED BY '${aegir_password}' WITH GRANT OPTION;",
+        command => "echo \"CREATE USER ${aegir_user} IDENTIFIED BY '${aegir_password}'; GRANT ALL PRIVILEGES ON *.* TO '${aegir_user}'@'${aegir_host}' IDENTIFIED BY '${aegir_password}' WITH GRANT OPTION;\" | mysql -uroot -p${password}",
         require => Service['mysql']
       }
     }
