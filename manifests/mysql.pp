@@ -6,11 +6,7 @@ class mysql (
   ],
   $conf_files = [
     'conf.d/char.cnf',
-    'conf.d/default.cnf',
     'conf.d/innodb.cnf',
-    'conf.d/old_passwords.cnf',
-    'conf.d/slow-query.cnf',
-    'my.cnf'
   ],
   $password = 'password',
   $hostname = 'purple0.nod1.se',
@@ -22,6 +18,8 @@ class mysql (
 ) {
   package { $packages:
     ensure => installed,
+    # We need to have innodb settings on before we install
+    require => File['/etc/mysql/conf.d/innodb.cnf']
   }
 
   service { mysql:
@@ -29,11 +27,6 @@ class mysql (
     ensure    => running,
     subscribe => Package['mysql-server'],
   }
-
-  # We need to adjust the configuration files to Lucid.
-  #conf_file { $conf_files:
-  #  require => Package['mysql-server'],
-  #}
 
   exec { 'mysqladmin password':
     unless => "mysqladmin -uroot -p${password} status",
@@ -54,8 +47,11 @@ class mysql (
       owner => root,
       group => root,
       mode => 0444,
-      source => "${module_root}/files/${name}",
+      source => "puppet:///modules/mysql/${name}",
     }
+  }
+
+  conf_file { $conf_files:
   }
 
   if ! $local_only {
