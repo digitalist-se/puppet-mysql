@@ -66,7 +66,7 @@ class mysql (
 
     if $create_aegir_user {
       exec { 'mysql-create-aegir-user':
-        unless => "echo 'use mysql;select user from user;' | mysql -uroot -ppassword | grep ${aegir_user} > /dev/null",
+        unless => "echo 'use mysql;select user, host from user;' | mysql -uroot -ppassword | grep ${aegir_user} | grep ${aegir_host} > /dev/null",
         path => ['/bin', '/usr/bin'],
         command => "echo \"CREATE USER ${aegir_user} IDENTIFIED BY '${aegir_password}'; GRANT ALL PRIVILEGES ON *.* TO '${aegir_user}'@'${aegir_host}' IDENTIFIED BY '${aegir_password}' WITH GRANT OPTION;\" | mysql -uroot -p${password}",
         require => Service['mysql']
