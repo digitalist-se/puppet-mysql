@@ -18,7 +18,7 @@ class mysql (
 ) {
   package { $packages:
     ensure => installed,
-    # We need to have innodb settings on before we install
+    # We need to have innodb settings in place before installation.
     require => File['/etc/mysql/conf.d/innodb.cnf']
   }
 
@@ -42,12 +42,22 @@ class mysql (
     require => [Service['mysql'], Exec['mysqladmin password']],
   }
 
+  file { "/etc/mysql":
+    ensure => directory
+  }
+
+  file { "/etc/mysql/conf.d":
+    ensure => directory
+  }
+
+  
   define conf_file() {
     file { "/etc/mysql/${name}":
       owner => root,
       group => root,
       mode => 0444,
       source => "puppet:///modules/mysql/${name}",
+      require => [File["/etc/mysql"],File["/etc/mysql/conf.d"]]
     }
   }
 
